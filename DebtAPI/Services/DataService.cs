@@ -7,7 +7,6 @@ namespace DebtAPI.Services
 {
     public class DataService : IDataService
     {
-        private readonly string _collectionName;
         private readonly IMongoCollection<Debt> _debtCollection;
 
         public DataService(AppSettings appSettings)
@@ -25,7 +24,7 @@ namespace DebtAPI.Services
             _debtCollection.InsertOne(debt);
         }
 
-        public IEnumerable<Debt> GetDebts(int amount)
+        public List<Debt> GetDebts(int amount)
         {
             return _debtCollection.Find(x => true).Limit(amount).ToList();
         }

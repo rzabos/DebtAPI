@@ -7,6 +7,6 @@ namespace DebtAPI.Services
     {
         void AddDebt(Debt debt);
 
-        IEnumerable<Debt> GetDebts(int amount);
+        List<Debt> GetDebts(int amount);
     }
 }
