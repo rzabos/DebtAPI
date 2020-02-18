@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DebtAPI.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -27,7 +28,7 @@ namespace DebtAPI.Services
 
         public List<Debt> GetDebts(int amount)
         {
-            return _debtCollection.Find(x => true).Limit(amount).ToList();
+            return _debtCollection.AsQueryable().OrderByDescending(d => d.Date).Take(amount).ToList();
         }
     }
 }
