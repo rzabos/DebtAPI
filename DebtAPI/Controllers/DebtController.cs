@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DebtAPI.Controllers
 {
+    [Route("v1/debt")]
     public class DebtController : ControllerBase
     {
         private readonly IDataService _dataService;
@@ -16,7 +17,7 @@ namespace DebtAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/debt/{amount}")]
+        [Route("{amount}")]
         public ActionResult<List<Debt>> Get(int amount)
         {
             var debts = _dataService.GetDebts(amount);
@@ -29,7 +30,7 @@ namespace DebtAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/debt")]
+        [Route("")]
         public void Post([FromBody] Debt debt)
         {
             _dataService.AddDebt(debt);

@@ -37,6 +37,7 @@ namespace DebtAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddOptions();
             services.Configure<AppSettings>(Configuration.GetSection("ApplicationSettings"));
             services.AddSingleton<IDataService, DataService>();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DebtAPI.Models;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace DebtAPI.Services
@@ -9,9 +10,9 @@ namespace DebtAPI.Services
     {
         private readonly IMongoCollection<Debt> _debtCollection;
 
-        public DataService(AppSettings appSettings)
+        public DataService(IOptions<AppSettings> appSettings)
         {
-            _debtCollection = new MongoClient().GetDatabase(appSettings.DatabaseName).GetCollection<Debt>(appSettings.CollectionName);
+            _debtCollection = new MongoClient().GetDatabase(appSettings.Value.DatabaseName).GetCollection<Debt>(appSettings.Value.CollectionName);
         }
 
         public void AddDebt(Debt debt)
