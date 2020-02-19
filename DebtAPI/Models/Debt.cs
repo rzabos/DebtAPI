@@ -8,8 +8,8 @@ namespace DebtAPI.Models
     {
         public int Amount { get; set; }
 
-        public DateTime Date { get; set; }
+        public string Asset { get; set; }
 
-        public string Name { get; set; }
+        public DateTime Date { get; set; }
     }
 }
