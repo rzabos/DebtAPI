@@ -44,7 +44,7 @@ namespace DebtAPI
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddMongoDbStores<IMongoDbContext>(mongo)
                 .AddDefaultTokenProviders()
-                .AddRoleManager<RoleManager<IdentityRole>>()
+                .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddSignInManager<SignInManager<ApplicationUser>>();
 
             services.Configure<IdentityOptions>(options =>
@@ -60,7 +60,6 @@ namespace DebtAPI
                 options.Lockout.MaxFailedAccessAttempts = 10;
 
                 // ApplicationUser settings
-                options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
             });
 
