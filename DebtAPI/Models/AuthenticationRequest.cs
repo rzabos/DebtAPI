@@ -1,6 +1,6 @@
 ﻿namespace DebtAPI.Models
 {
-    public class UserRequest
+    public class AuthenticationRequest
     {
         public string Password { get; set; }
 
