@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DebtAPI.Models.Database;
+using System.Threading.Tasks;
+using DebtAPI.Models.Settings;
 using MessageLibrary.Database;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MoreLinq;
 
 namespace DebtAPI.Services
 {
@@ -21,7 +21,7 @@ namespace DebtAPI.Services
             _pageSize = databaseSettings.Value.PageSize;
         }
 
-        public void AddDebt(Debt debt, Contract contract)
+        public async Task AddDebt(Debt debt, Contract contract)
         {
             if (debt == null)
             {
@@ -40,10 +40,10 @@ namespace DebtAPI.Services
             }
 
             var collection = _mongoDatabase.GetCollection<Debt>(contract.ToString());
-            collection.InsertOne(debt);
+            await collection.InsertOneAsync(debt);
         }
 
-        public IEnumerable<Debt> GetDebts(int page, Contract contract)
+        public async Task<IEnumerable<Debt>> GetDebts(int page, Contract contract)
         {
             if (contract == null)
             {
@@ -56,14 +56,14 @@ namespace DebtAPI.Services
                 throw new KeyNotFoundException("The given contract is missing from the database!");
             }
 
-            return collection.AsQueryable()
+            return await collection.AsQueryable().ToAsyncEnumerable()
                 .OrderByDescending(d => d.Date)
                 .Skip(_pageSize * (page - 1))
                 .Take(_pageSize)
                 .ToList();
         }
 
-        public int GetFinance(Contract contract)
+        public async Task<int> GetFinance(Contract contract)
         {
             if (contract == null)
             {
@@ -77,7 +77,7 @@ namespace DebtAPI.Services
             }
 
             var finance = 0;
-            collection.AsQueryable().ForEach(debt =>
+            await collection.AsQueryable().ForEachAsync(debt =>
             {
                 if (debt.UserName == contract.UserName)
                 {

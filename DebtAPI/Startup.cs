@@ -1,6 +1,5 @@
 ﻿using System;
 using DebtAPI.Models.Authentication;
-using DebtAPI.Models.Database;
 using DebtAPI.Models.Settings;
 using DebtAPI.Services;
 using Microsoft.AspNetCore.Builder;

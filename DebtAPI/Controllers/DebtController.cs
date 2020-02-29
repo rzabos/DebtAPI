@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using DebtAPI.Models.Authentication;
 using DebtAPI.Services;
 using MessageLibrary.Database;
@@ -27,74 +29,74 @@ namespace DebtAPI.Controllers
         }
 
         [HttpPost]
-        public Response AddDebt([FromBody] AddDebtRequest addDebtRequest)
+        public async Task<ActionResult<Response>> AddDebt([FromBody] AddDebtRequest addDebtRequest)
         {
             var requestValidation = ValidateRequests.Validate(addDebtRequest);
             if (requestValidation != null)
             {
-                return new Response(requestValidation);
+                return BadRequest(new Response(requestValidation));
             }
 
             try
             {
                 var contract = new Contract(User.Identity.Name, addDebtRequest.OppositeUser);
-                _dataService.AddDebt(addDebtRequest.Debt, contract);
+                await _dataService.AddDebt(addDebtRequest.Debt, contract);
             }
             catch (KeyNotFoundException ex)
             {
-                return new Response(ex.Message);
+                return NotFound(new Response(ex.Message));
             }
             catch (Exception)
             {
-                return new Response("Something went wrong!");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new Response("Something went wrong!"));
             }
 
-            return new Response("The given debt informations have been processed successfully!", true);
+            return Ok(new Response("The given debt informations have been processed successfully!", true));
         }
 
         [HttpGet]
-        public Response GetFinance([FromBody] Request financeRequest)
+        public async Task<ActionResult<Response>> GetFinance([FromBody] Request financeRequest)
         {
             var requestValidation = ValidateRequests.Validate(financeRequest);
             if (requestValidation != null)
             {
-                return new Response(requestValidation);
+                return BadRequest(new Response(requestValidation));
             }
 
             try
             {
-                var finance = _dataService.GetFinance(new Contract(User.Identity.Name, financeRequest.OppositeUser));
-                return new FinanceResponse("Finance has been calculated successfully!", true, finance);
+                var finance = await _dataService.GetFinance(new Contract(User.Identity.Name, financeRequest.OppositeUser));
+                return Ok(new FinanceResponse("Finance has been calculated successfully!", true, finance));
             }
             catch (KeyNotFoundException ex)
             {
-                return new Response(ex.Message);
+                return NotFound(new Response(ex.Message));
             }
             catch (Exception)
             {
-                return new Response("Something went wrong!");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new Response("Something went wrong!"));
             }
         }
 
         [HttpGet]
         [Route("{amount}")]
-        public Response GetHistory([FromBody] HistoryRequest historyRequest)
+        public async Task<ActionResult<Response>> GetHistory([FromBody] HistoryRequest historyRequest)
         {
             var page = historyRequest.Page < 1 ? 1 : historyRequest.Page;
 
             try
             {
-                var debts = _dataService.GetDebts(page, new Contract(User.Identity.Name, historyRequest.OppositeUser));
+                var debts = await _dataService.GetDebts(page, new Contract(User.Identity.Name, historyRequest.OppositeUser));
                 if (debts?.Any() != true)
                 {
-                    return new Response("Cannot find any debts!");
+                    return NotFound(new Response("Cannot find any debts!"));
                 }
 
-                return new HistoryResponse("Debts were fetched successfully!", true, debts);
+                return Ok(new HistoryResponse("Debts were fetched successfully!", true, debts));
             }
             catch (Exception)
             {
-                return new Response("Something went wrong!");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new Response("Something went wrong!"));
             }
         }
     }

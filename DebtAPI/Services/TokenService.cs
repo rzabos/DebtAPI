@@ -2,7 +2,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using DebtAPI.Models;
+using DebtAPI.Models.Authentication;
+using DebtAPI.Models.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

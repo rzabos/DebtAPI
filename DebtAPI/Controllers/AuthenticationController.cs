@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DebtAPI.Models.Authentication;
 using DebtAPI.Services;
+using MessageLibrary.Helpers;
+using MessageLibrary.Requests;
+using MessageLibrary.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +32,10 @@ namespace DebtAPI.Controllers
         [Route("login")]
         public async Task<ActionResult> Login([FromBody] AuthenticationRequest userRequest)
         {
-            if (!IsValidRequest(userRequest))
+            var requestValidation = ValidateRequests.Validate(userRequest);
+            if (requestValidation != null)
             {
-                return BadRequest(new AuthenticationResponse("The request is invalid!"));
+                return BadRequest(new AuthenticationResponse(requestValidation));
             }
 
             try
@@ -52,7 +56,7 @@ namespace DebtAPI.Controllers
             }
             catch (Exception)
             {
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, new AuthenticationResponse("Something went wrong!"));
             }
         }
 
@@ -60,9 +64,10 @@ namespace DebtAPI.Controllers
         [Route("register")]
         public async Task<ActionResult> Register([FromBody] AuthenticationRequest userRequest)
         {
-            if (!IsValidRequest(userRequest))
+            var requestValidation = ValidateRequests.Validate(userRequest);
+            if (requestValidation != null)
             {
-                return BadRequest(new AuthenticationResponse("The request is invalid!"));
+                return BadRequest(new AuthenticationResponse(requestValidation));
             }
 
             try
@@ -78,7 +83,7 @@ namespace DebtAPI.Controllers
             }
             catch (Exception)
             {
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, new AuthenticationResponse("Something went wrong!"));
             }
         }
 
@@ -93,7 +98,5 @@ namespace DebtAPI.Controllers
 
             return stringBuilder.ToString();
         }
-
-        private bool IsValidRequest(AuthenticationRequest userRequest) => userRequest != null && !string.IsNullOrWhiteSpace(userRequest.UserName) && !string.IsNullOrWhiteSpace(userRequest.Password);
     }
 }

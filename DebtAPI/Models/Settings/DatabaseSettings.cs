@@ -1,4 +1,4 @@
-﻿namespace DebtAPI.Models.Database
+﻿namespace DebtAPI.Models.Settings
 {
     public class DatabaseSettings
     {

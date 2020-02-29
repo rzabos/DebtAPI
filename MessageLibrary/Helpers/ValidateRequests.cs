@@ -4,6 +4,26 @@ namespace MessageLibrary.Helpers
 {
     public static class ValidateRequests
     {
+        public static string Validate(AuthenticationRequest authenticationRequest)
+        {
+            if (authenticationRequest == null)
+            {
+                return "Invalid request!";
+            }
+
+            if (string.IsNullOrWhiteSpace(authenticationRequest.UserName))
+            {
+                return "Invalid username!";
+            }
+
+            if (string.IsNullOrWhiteSpace(authenticationRequest.Password))
+            {
+                return "Invalid password!";
+            }
+
+            return null;
+        }
+
         public static string Validate(AddDebtRequest addDebtRequest)
         {
             var requestValidation = Validate(addDebtRequest);
