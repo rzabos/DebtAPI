@@ -1,5 +1,7 @@
 ﻿using System;
-using DebtAPI.Models;
+using DebtAPI.Models.Authentication;
+using DebtAPI.Models.Database;
+using DebtAPI.Models.Settings;
 using DebtAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,7 +42,8 @@ namespace DebtAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var mongo = new MongoDbContext(Configuration.GetConnectionString("DatabaseConnectionStrings"), "Debts");
+            var databaseSettings = Configuration.GetValue<DatabaseSettings>(nameof(DatabaseSettings));
+            var mongo = new MongoDbContext(databaseSettings.ConnectionStrings, databaseSettings.DatabaseName);
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddMongoDbStores<IMongoDbContext>(mongo)
                 .AddDefaultTokenProviders()
@@ -66,8 +69,8 @@ namespace DebtAPI
             services.AddAuthorization();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddOptions();
-            services.Configure<AppSettings>(Configuration.GetSection("ApplicationSettings"));
-            services.Configure<JwtSettings>(Configuration.GetSection("Jwt"));
+            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
+            services.Configure<JwtSettings>(Configuration.GetSection(nameof(JwtSettings)));
             services.AddSingleton<IDataService, DataService>();
             services.AddSingleton<ITokenService, TokenService>();
         }

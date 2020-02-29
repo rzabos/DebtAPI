@@ -1,4 +1,4 @@
-﻿namespace DebtAPI.Models
+﻿namespace MessageLibrary.Requests
 {
     public class AuthenticationRequest
     {

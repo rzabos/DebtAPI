@@ -1,4 +1,4 @@
-﻿using DebtAPI.Models;
+﻿using DebtAPI.Models.Authentication;
 
 namespace DebtAPI.Services
 {

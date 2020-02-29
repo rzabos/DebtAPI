@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
-using DebtAPI.Models;
+using MessageLibrary.Database;
 
 namespace DebtAPI.Services
 {
     public interface IDataService
     {
-        void AddDebt(Debt debt);
+        void AddDebt(Debt debt, Contract contract);
 
-        List<Debt> GetDebts(int amount);
+        IEnumerable<Debt> GetDebts(int page, Contract contract);
+
+        int GetFinance(Contract contract);
     }
 }

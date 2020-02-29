@@ -1,6 +1,6 @@
 ﻿using AspNetCore.Identity.MongoDbCore.Models;
 
-namespace DebtAPI.Models
+namespace DebtAPI.Models.Authentication
 {
     public class ApplicationRole : MongoIdentityRole
     {

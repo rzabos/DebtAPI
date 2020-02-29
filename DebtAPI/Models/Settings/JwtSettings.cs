@@ -1,4 +1,4 @@
-﻿namespace DebtAPI.Models
+﻿namespace DebtAPI.Models.Settings
 {
     public class JwtSettings
     {
