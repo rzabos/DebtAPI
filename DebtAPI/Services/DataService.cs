@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using DebtAPI.Models.Settings;
 using MessageLibrary.Database;
+using MessageLibrary.Requests;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace DebtAPI.Services
@@ -17,7 +17,7 @@ namespace DebtAPI.Services
 
         public DataService(IOptions<DatabaseSettings> databaseSettings)
         {
-            _mongoDatabase = new MongoClient().GetDatabase(databaseSettings.Value.DatabaseName);
+            _mongoDatabase = new MongoClient().GetDatabase(databaseSettings.Value.HistoryDatabase);
             _pageSize = databaseSettings.Value.PageSize;
         }
 
@@ -33,28 +33,25 @@ namespace DebtAPI.Services
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            var collectionName = contract.ToString();
-            if (!Exists(collectionName))
-            {
-                throw new KeyNotFoundException($"{collectionName} is not found in the database!");
-            }
-
-            var collection = _mongoDatabase.GetCollection<Debt>(contract.ToString());
-            await collection.InsertOneAsync(debt);
+            var collection = _mongoDatabase.GetCollection<DebtWrapper>(await GetCollectionName(contract) ?? contract.ToString());
+            var wrapper = new DebtWrapper(debt, contract.UserName);
+            await collection.InsertOneAsync(wrapper);
         }
 
-        public async Task<IEnumerable<Debt>> GetDebts(int page, Contract contract)
+        public async Task<IEnumerable<DebtWrapper>> GetDebts(int page, Contract contract)
         {
             if (contract == null)
             {
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            var collection = GetCollection(contract);
-            if (collection == null)
+            var collectionName = await GetCollectionName(contract);
+            if (collectionName == null)
             {
                 throw new KeyNotFoundException("The given contract is missing from the database!");
             }
+
+            var collection = _mongoDatabase.GetCollection<DebtWrapper>(collectionName);
 
             return await collection.AsQueryable().ToAsyncEnumerable()
                 .OrderByDescending(d => d.Date)
@@ -70,13 +67,15 @@ namespace DebtAPI.Services
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            var collection = GetCollection(contract);
-            if (collection == null)
+            var collectionName = await GetCollectionName(contract);
+            if (collectionName == null)
             {
                 throw new KeyNotFoundException("The given contract is missing from the database!");
             }
 
+            var collection = _mongoDatabase.GetCollection<DebtWrapper>(collectionName);
             var finance = 0;
+
             await collection.AsQueryable().ForEachAsync(debt =>
             {
                 if (debt.UserName == contract.UserName)
@@ -92,18 +91,10 @@ namespace DebtAPI.Services
             return finance;
         }
 
-        private bool Exists(string collectionName)
+        private async Task<string> GetCollectionName(Contract contract)
         {
-            var filter = new BsonDocument("name", collectionName);
-            var options = new ListCollectionNamesOptions { Filter = filter };
-
-            return _mongoDatabase.ListCollectionNames(options).Any();
-        }
-
-        private IMongoCollection<Debt> GetCollection(Contract contract)
-        {
-            var contractName = contract.ToString();
-            return Exists(contractName) ? _mongoDatabase.GetCollection<Debt>(contractName) : null;
+            var collectionNames = await _mongoDatabase.ListCollectionNames().ToListAsync();
+            return collectionNames.FirstOrDefault(c => c == contract.UserName + contract.OppositeUserName || c == contract.OppositeUserName + contract.UserName);
         }
     }
 }

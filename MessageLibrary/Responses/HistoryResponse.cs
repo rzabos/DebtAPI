@@ -5,7 +5,7 @@ namespace MessageLibrary.Responses
 {
     public class HistoryResponse : Response
     {
-        public HistoryResponse(string message, bool isSuccessful, IEnumerable<Debt> debts)
+        public HistoryResponse(string message, bool isSuccessful, IEnumerable<DebtWrapper> debts)
             : this(message, isSuccessful)
         {
             Debts = debts;
@@ -21,6 +21,6 @@ namespace MessageLibrary.Responses
         {
         }
 
-        public IEnumerable<Debt> Debts { get; private set; }
+        public IEnumerable<DebtWrapper> Debts { get; private set; }
     }
 }

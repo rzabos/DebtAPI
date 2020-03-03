@@ -24,16 +24,36 @@ namespace MessageLibrary.Helpers
             return null;
         }
 
+        public static string Validate(Debt debt)
+        {
+            if (debt == null)
+            {
+                return "Invalid request!";
+            }
+
+            if (string.IsNullOrWhiteSpace(debt.Asset))
+            {
+                return "Invalid asset has been specified!";
+            }
+
+            if (debt.Amount < 0)
+            {
+                return "Invalid amount of debt has been specified!";
+            }
+
+            return null;
+        }
+
         public static string Validate(AddDebtRequest addDebtRequest)
         {
-            var requestValidation = Validate(addDebtRequest);
-            if (requestValidation == null)
+            var requestValidation = Validate(addDebtRequest as Request);
+            if (requestValidation != null)
             {
                 return requestValidation;
             }
 
-            var debtValidation = DatabaseHelper.Validate(addDebtRequest.Debt);
-            if (debtValidation == null)
+            var debtValidation = Validate(addDebtRequest.Debt);
+            if (debtValidation != null)
             {
                 return debtValidation;
             }

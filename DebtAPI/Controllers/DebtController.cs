@@ -63,9 +63,21 @@ namespace DebtAPI.Controllers
                 return BadRequest(new Response(requestValidation));
             }
 
+            var oppositeUser = await _userManager.FindByNameAsync(financeRequest.OppositeUser);
+            if (oppositeUser == null)
+            {
+                return BadRequest(new Response("Opposite user is not registered!"));
+            }
+
+            var currentUser = User.Identity.Name;
+            if (currentUser == oppositeUser.UserName)
+            {
+                return BadRequest(new Response("Speficy different user than yours!"));
+            }
+
             try
             {
-                var finance = await _dataService.GetFinance(new Contract(User.Identity.Name, financeRequest.OppositeUser));
+                var finance = await _dataService.GetFinance(new Contract(currentUser, oppositeUser.UserName));
                 return Ok(new FinanceResponse("Finance has been calculated successfully!", true, finance));
             }
             catch (KeyNotFoundException ex)
@@ -79,20 +91,36 @@ namespace DebtAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{amount}")]
+        [Route("history")]
         public async Task<ActionResult<Response>> GetHistory([FromBody] HistoryRequest historyRequest)
         {
             var page = historyRequest.Page < 1 ? 1 : historyRequest.Page;
 
+            var oppositeUser = await _userManager.FindByNameAsync(historyRequest.OppositeUser);
+            if (oppositeUser == null)
+            {
+                return BadRequest(new Response("Opposite user is not registered!"));
+            }
+
+            var currentUser = User.Identity.Name;
+            if (currentUser == oppositeUser.UserName)
+            {
+                return BadRequest(new Response("Speficy different user than yours!"));
+            }
+
             try
             {
-                var debts = await _dataService.GetDebts(page, new Contract(User.Identity.Name, historyRequest.OppositeUser));
+                var debts = await _dataService.GetDebts(page, new Contract(currentUser, oppositeUser.UserName));
                 if (debts?.Any() != true)
                 {
                     return NotFound(new Response("Cannot find any debts!"));
                 }
 
                 return Ok(new HistoryResponse("Debts were fetched successfully!", true, debts));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new Response(ex.Message));
             }
             catch (Exception)
             {

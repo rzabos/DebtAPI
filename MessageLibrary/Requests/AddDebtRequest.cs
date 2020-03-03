@@ -1,6 +1,4 @@
-﻿using MessageLibrary.Database;
-
-namespace MessageLibrary.Requests
+﻿namespace MessageLibrary.Requests
 {
     public class AddDebtRequest : Request
     {

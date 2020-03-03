@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MessageLibrary.Database;
+using MessageLibrary.Requests;
 
 namespace DebtAPI.Services
 {
@@ -8,7 +9,7 @@ namespace DebtAPI.Services
     {
         Task AddDebt(Debt debt, Contract contract);
 
-        Task<IEnumerable<Debt>> GetDebts(int page, Contract contract);
+        Task<IEnumerable<DebtWrapper>> GetDebts(int page, Contract contract);
 
         Task<int> GetFinance(Contract contract);
     }

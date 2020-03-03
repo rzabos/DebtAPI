@@ -41,8 +41,8 @@ namespace DebtAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var databaseSettings = Configuration.GetValue<DatabaseSettings>(nameof(DatabaseSettings));
-            var mongo = new MongoDbContext(databaseSettings.ConnectionStrings, databaseSettings.DatabaseName);
+            var databaseSettings = Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
+            var mongo = new MongoDbContext(databaseSettings.ConnectionStrings, databaseSettings.AuthenticationDatabase);
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddMongoDbStores<IMongoDbContext>(mongo)
                 .AddDefaultTokenProviders()
