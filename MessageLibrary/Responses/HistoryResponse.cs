@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using MessageLibrary.Database;
+using MessageLibrary.Requests;
 
 namespace MessageLibrary.Responses
 {
     public class HistoryResponse : Response
     {
-        public HistoryResponse(string message, bool isSuccessful, IEnumerable<DebtWrapper> debts)
+        public HistoryResponse(string message, bool isSuccessful, IEnumerable<Debt> debts)
             : this(message, isSuccessful)
         {
             Debts = debts;
@@ -21,6 +21,6 @@ namespace MessageLibrary.Responses
         {
         }
 
-        public IEnumerable<DebtWrapper> Debts { get; private set; }
+        public IEnumerable<Debt> Debts { get; private set; }
     }
 }
